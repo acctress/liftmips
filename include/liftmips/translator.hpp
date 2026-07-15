@@ -10,6 +10,11 @@ namespace liftmips::translator
 {
     using namespace liftmips::decoder;
 
+    inline std::unordered_map< opcode_t, std::string_view > opcode_mnemonics {
+        { opcode_t::ADDU, "iadd" },
+        { opcode_t::SUBU, "isub" },
+    };
+
     struct lift_context_t
     {
         std::array< std::string, 32 > reg_identifiers;
@@ -30,33 +35,21 @@ namespace liftmips::translator
 
     using lift_fn_t = void( * )( const instr_t&, lift_context_t& );
 
-    inline void lift_addu( const instr_t& instr, lift_context_t& ctx )
+    inline void lift_rrr( const instr_t& instr, lift_context_t& ctx )
     {
-        auto src1 = ctx.reg_identifiers[ instr.rs ];
-        auto src2 = ctx.reg_identifiers[ instr.rt ];
+        const auto& src1 = ctx.reg_identifiers[ instr.rs ];
+        const auto& src2 = ctx.reg_identifiers[ instr.rt ];
+        const auto& inst = opcode_mnemonics.at( instr.op );
+
         auto val = alloc_value( ctx );
-        const auto line = std::format( "{} = iadd {}, {}\n", val, src1, src2 );
+
+        const auto line = std::format( "{} = {} {}, {}\n", val, inst, src1, src2 );
         ctx.reg_identifiers[ instr.rd ] = val;
         ctx.ir += line;
     }
-
-    inline void lift_subu( const instr_t& instr, lift_context_t& ctx )
-    {
-        auto src1 = ctx.reg_identifiers[ instr.rs ];
-        auto src2 = ctx.reg_identifiers[ instr.rt ];
-        auto val = alloc_value( ctx );
-        const auto line = std::format( "{} = isub {}, {}\n", val, src1, src2 );
-        ctx.reg_identifiers[ instr.rd ] = val;
-        ctx.ir += line;
-    }
-
-    inline std::unordered_map< opcode_t, lift_fn_t > lift_table {
-        { opcode_t::ADDU, lift_addu },
-        { opcode_t::SUBU, lift_subu },
-    };
 
     inline void lift_instr( const instr_t& instr, lift_context_t& ctx )
     {
-        lift_table.at( instr.op )( instr, ctx );
+        lift_rrr( instr, ctx );
     }
 }
