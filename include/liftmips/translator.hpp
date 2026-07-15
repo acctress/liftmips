@@ -8,6 +8,8 @@
 
 namespace liftmips::translator
 {
+    using namespace liftmips::decoder;
+
     struct lift_context_t
     {
         std::array< std::string, 32 > reg_identifiers;
@@ -26,23 +28,24 @@ namespace liftmips::translator
         return "%" + std::to_string( ctx.next_value_id++ );
     }
 
-    inline void lift_addu( const decoder::instr_t& instr, lift_context_t& ctx )
-    {
-        std::println("lifting addu");
+    using life_fn_t = void( * )( const instr_t&, lift_context_t& );
 
+    inline void lift_addu( const instr_t& instr, lift_context_t& ctx )
+    {
         auto src = ctx.reg_identifiers[ instr.rs ];
         auto src2 = ctx.reg_identifiers[ instr.rt ];
         auto val = alloc_value( ctx );
-        auto line = std::format( "{} = iadd {}, {}", val, src, src2 );
+        const auto line = std::format( "{} = iadd {}, {}", val, src, src2 );
         ctx.reg_identifiers[ instr.rd ] = val;
         ctx.ir += line;
     }
 
-    inline void lift_instr( const decoder::instr_t& instr, lift_context_t& ctx )
+    inline std::unordered_map< opcode_t, life_fn_t > lift_table {
+        { opcode_t::ADDU, lift_addu },
+    };
+
+    inline void lift_instr( const instr_t& instr, lift_context_t& ctx )
     {
-        switch ( instr.op )
-        {
-            case decoder::opcode_t::ADDU: lift_addu( instr, ctx ); break;
-        }
+        lift_table.at( instr.op )( instr, ctx );
     }
 }
