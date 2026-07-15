@@ -1,5 +1,6 @@
 add_executable(liftmips_tests
-        decoder.cpp)
+        decoder.cpp
+        translator.cpp)
 
 target_include_directories(liftmips_tests PRIVATE
         ${CMAKE_SOURCE_DIR}/include
