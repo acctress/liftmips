@@ -1,10 +1,7 @@
-#include "entry.hpp"
+#include <print>
 
-///@brief The entry point of the application.
 std::int32_t main( )
 {
-    constexpr example_t example;
-    example.print( );
-
-    return EXIT_SUCCESS;
+    std::println("hello world!");
+    return 0;
 }
