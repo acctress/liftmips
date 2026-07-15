@@ -1,10 +1,10 @@
 #pragma once
 
 #include <liftmips/decoder.hpp>
+#include <unordered_map>
 #include <string>
 #include <array>
 #include <format>
-#include <print>
 
 namespace liftmips::translator
 {
@@ -28,19 +28,19 @@ namespace liftmips::translator
         return "%" + std::to_string( ctx.next_value_id++ );
     }
 
-    using life_fn_t = void( * )( const instr_t&, lift_context_t& );
+    using lift_fn_t = void( * )( const instr_t&, lift_context_t& );
 
     inline void lift_addu( const instr_t& instr, lift_context_t& ctx )
     {
-        auto src = ctx.reg_identifiers[ instr.rs ];
+        auto src1 = ctx.reg_identifiers[ instr.rs ];
         auto src2 = ctx.reg_identifiers[ instr.rt ];
         auto val = alloc_value( ctx );
-        const auto line = std::format( "{} = iadd {}, {}", val, src, src2 );
+        const auto line = std::format( "{} = iadd {}, {}\n", val, src, src2 );
         ctx.reg_identifiers[ instr.rd ] = val;
         ctx.ir += line;
     }
 
-    inline std::unordered_map< opcode_t, life_fn_t > lift_table {
+    inline std::unordered_map< opcode_t, lift_fn_t > lift_table {
         { opcode_t::ADDU, lift_addu },
     };
 
