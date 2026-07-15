@@ -35,7 +35,7 @@ namespace liftmips::translator
         auto src1 = ctx.reg_identifiers[ instr.rs ];
         auto src2 = ctx.reg_identifiers[ instr.rt ];
         auto val = alloc_value( ctx );
-        const auto line = std::format( "{} = iadd {}, {}\n", val, src, src2 );
+        const auto line = std::format( "{} = iadd {}, {}\n", val, src1, src2 );
         ctx.reg_identifiers[ instr.rd ] = val;
         ctx.ir += line;
     }
