@@ -8,6 +8,7 @@ namespace liftmips::decoder
     enum class opcode_t : std::uint8_t
     {
         ADDU,
+        SUBU,
     };
 
     struct instr_t
@@ -21,6 +22,7 @@ namespace liftmips::decoder
 
     inline std::unordered_map< std::uint32_t, opcode_t > opcode_table {
         { 0x21, opcode_t::ADDU },
+        { 0x23, opcode_t::SUBU },
     };
 
     constexpr std::uint32_t extract_bits( const std::uint32_t word, const int high, const int low )
